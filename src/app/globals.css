@@ -1,0 +1,439 @@
+@import "tailwindcss";
+
+/* ============================================================
+   FLIP7 DESIGN SYSTEM — Admin Console
+   Teal · Coral · Gold · Retro-Playful
+   ============================================================ */
+
+/* ── Override Tailwind v4 color tokens at the source ──
+   By redefining --color-zinc-* and --color-purple-* inside @theme,
+   EVERY generated utility class (bg-zinc-900/40, text-zinc-400, etc.)
+   automatically uses the Flip7 palette — including opacity variants.
+   ── */
+@theme {
+  /* Remap zinc dark shades → light teal-white surfaces */
+  --color-zinc-950: #EFF8F7;   /* page background → surface-base */
+  --color-zinc-900: #FFFFFF;   /* card backgrounds → white */
+  --color-zinc-850: #F5FBFA;   /* subtle surface */
+  --color-zinc-800: #E8F6F5;   /* primary-bg teal tint */
+  --color-zinc-700: #D5EDE9;   /* slightly deeper teal tint */
+  --color-zinc-600: #A8C8C5;   /* light text */
+  --color-zinc-500: #7BA8A4;   /* muted text */
+  --color-zinc-400: #4A7070;   /* mid text */
+  --color-zinc-300: #2C5858;   /* dark-mid text */
+  --color-zinc-200: #1E3A3A;   /* dark text */
+  --color-zinc-100: #1E3A3A;   /* dark text */
+
+  /* Remap purple → Teal */
+  --color-purple-950: #1E8C86;
+  --color-purple-900: #1E8C86;
+  --color-purple-800: #1E8C86;
+  --color-purple-700: #1E8C86;
+  --color-purple-600: #2BA8A2;
+  --color-purple-500: #3CC4BD;
+  --color-purple-400: #3CC4BD;
+  --color-purple-300: #2BA8A2;
+  --color-purple-200: #E8F6F5;
+
+  /* Remap indigo → Teal dark */
+  --color-indigo-600: #1E8C86;
+  --color-indigo-500: #2BA8A2;
+  --color-indigo-400: #3CC4BD;
+  --color-indigo-100: #FFF8E7;
+
+  /* Remap rose → Coral */
+  --color-rose-600: #D45233;
+  --color-rose-500: #EF6C4A;
+  --color-rose-400: #EF6C4A;
+  --color-rose-350: #FF8A6A;
+  --color-rose-300: #FF8A6A;
+
+  /* Keep emerald as success green */
+  --color-emerald-500: #27AE60;
+  --color-emerald-400: #27AE60;
+
+  /* Black overlays → cream/teal tints */
+  --color-black: #1E3A3A;
+}
+
+/* ============================================================
+   FLIP7 CSS CUSTOM PROPERTIES
+   ============================================================ */
+:root {
+  /* --- Primary Teal --- */
+  --color-primary:        #2BA8A2;
+  --color-primary-light:  #3CC4BD;
+  --color-primary-dark:   #1E8C86;
+  --color-primary-bg:     #E8F6F5;
+
+  /* --- Accent Gold --- */
+  --color-gold:           #FFD23F;
+  --color-gold-light:     #FFE47A;
+  --color-gold-dark:      #E6B800;
+
+  /* --- Coral --- */
+  --color-coral:          #EF6C4A;
+  --color-coral-light:    #FF8A6A;
+  --color-coral-dark:     #D45233;
+
+  /* --- Neutral / Surface --- */
+  --color-cream:          #FFF8E7;
+  --color-sky:            #5DADE2;
+  --color-surface-base:   #EFF8F7;
+  --color-surface-card:   #FFFFFF;
+  --color-success:        #27AE60;
+  --color-error:          #E74C3C;
+
+  /* --- Text --- */
+  --color-text-dark:      #1E3A3A;
+  --color-text-mid:       #4A7070;
+  --color-text-muted:     #7BA8A4;
+  --color-text-light:     #A8C8C5;
+
+  /* --- Shadows (Colored Glow System) --- */
+  --shadow-sm:            0 2px 8px rgba(0,0,0,0.08);
+  --shadow-md:            0 4px 16px rgba(0,0,0,0.12);
+  --shadow-lg:            0 8px 32px rgba(0,0,0,0.16);
+  --shadow-card:          0 4px 20px rgba(43,168,162,0.10);
+  --shadow-card-hover:    0 6px 28px rgba(43,168,162,0.18);
+  --shadow-coral-glow:    0 4px 20px rgba(239,108,74,0.35);
+  --shadow-teal-glow:     0 4px 20px rgba(43,168,162,0.30);
+  --shadow-accent-glow:   0 4px 20px rgba(255,210,63,0.40);
+  --shadow-sky-glow:      0 4px 16px rgba(93,173,226,0.30);
+  --shadow-focus:         0 0 0 4px rgba(43,168,162,0.15);
+
+  /* --- Border Radius --- */
+  --radius-sm:   8px;
+  --radius-md:   16px;
+  --radius-lg:   24px;
+  --radius-xl:   32px;
+  --radius-pill: 999px;
+
+  /* --- Spacing (base 8px) --- */
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 32px;
+  --space-xl: 48px;
+
+  /* --- Button Bounce Curve --- */
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--color-surface-base);
+  color: var(--color-text-dark);
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   EXTRA OVERRIDES — classes that slip through @theme
+   (opacity variants, text-white on dark backgrounds, etc.)
+   ============================================================ */
+
+/* text-white → dark teal text (since backgrounds are now light) */
+.text-white {
+  color: var(--color-text-dark) !important;
+}
+
+/* Exception: text-white INSIDE a teal/gold background should stay cream */
+[class*="bg-purple"] .text-white,
+[style*="background: linear-gradient"] .text-white,
+[style*="background-color: var(--color-primary)"] .text-white,
+.btn-primary .text-white,
+.btn-danger .text-white {
+  color: #FFF8E7 !important;
+}
+
+/* Modal/overlay backdrops: bg-black/70 stays dark for overlay */
+.bg-black\/70,
+.bg-black\/60 {
+  background-color: rgba(30, 58, 58, 0.70) !important;
+}
+
+/* bg-zinc-900/30, bg-zinc-900/40, bg-zinc-900/50 (opacity variants) 
+   → soft teal-tinted white */
+[class*="bg-zinc-900\/"] {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+}
+
+/* bg-zinc-950 inputs → cream */
+[class*="bg-zinc-950"] {
+  background-color: var(--color-cream) !important;
+}
+
+/* border-zinc-850, border-zinc-855 (custom shades) → teal tint */
+[class*="border-zinc-85"] {
+  border-color: rgba(43, 168, 162, 0.18) !important;
+}
+
+/* Action icon buttons: bg-zinc-950 hover:bg-zinc-800 etc → teal tint */
+[class*="hover:bg-zinc-8"]:hover {
+  background-color: var(--color-primary-bg) !important;
+}
+
+/* hover:bg-white/5 → teal tint hover */
+.hover\:bg-white\/5:hover {
+  background-color: rgba(43, 168, 162, 0.06) !important;
+}
+
+/* placeholder text */
+[class*="placeholder-zinc"] {
+  color: var(--color-text-light) !important;
+}
+
+/* placeholder-zinc-500, placeholder-zinc-600 */
+.placeholder-zinc-500::placeholder,
+.placeholder-zinc-600::placeholder {
+  color: var(--color-text-light) !important;
+}
+
+/* purple-950/10, purple-950/20 (bg for item type badges) → teal tint */
+[class*="bg-purple-950\/"] {
+  background-color: rgba(43, 168, 162, 0.10) !important;
+}
+[class*="border-purple-900\/"] {
+  border-color: rgba(43, 168, 162, 0.15) !important;
+}
+
+/* blue-950/20 → sky tint */
+[class*="bg-blue-950\/"] {
+  background-color: rgba(93, 173, 226, 0.10) !important;
+}
+[class*="border-blue-900\/"] {
+  border-color: rgba(93, 173, 226, 0.15) !important;
+}
+
+/* animate-in class (used by modals) */
+.animate-in { animation-duration: 150ms; }
+
+/* ============================================================
+   KEYFRAME ANIMATIONS
+   ============================================================ */
+
+@keyframes flip7-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1.0); }
+  50%       { opacity: 1.0; transform: scale(1.03); }
+}
+
+@keyframes boom-pulse {
+  0%, 100% { box-shadow: 0 4px 20px rgba(239,108,74,0.25); }
+  50%       { box-shadow: 0 4px 30px rgba(239,108,74,0.55); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes bar-grow {
+  from { transform: scaleY(0); transform-origin: bottom; }
+  to   { transform: scaleY(1); transform-origin: bottom; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-from-right {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes zoom-in-95 {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+
+.flip7-card {
+  background: var(--color-surface-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  border: 1.5px solid rgba(43,168,162,0.08);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.flip7-card:hover {
+  box-shadow: var(--shadow-card-hover);
+  border-color: rgba(43,168,162,0.18);
+}
+
+.flip7-card-accent-teal  { border-left: 4px solid var(--color-primary); }
+.flip7-card-accent-gold  { border-left: 4px solid var(--color-gold); }
+.flip7-card-accent-coral { border-left: 4px solid var(--color-coral); }
+.flip7-card-accent-sky   { border-left: 4px solid var(--color-sky); }
+
+/* Primary CTA — Gold */
+.btn-primary {
+  background: linear-gradient(135deg, #FFD23F, #E6B800);
+  color: #2C3E50 !important;
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+  min-height: 44px;
+  padding: 0 var(--space-lg);
+  box-shadow: var(--shadow-accent-glow);
+  transition: transform 0.2s var(--ease-bounce), box-shadow 0.2s ease, opacity 0.15s ease;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 50% 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.25), transparent);
+  border-radius: var(--radius-pill) var(--radius-pill) 0 0;
+  pointer-events: none;
+}
+
+.btn-primary:hover  { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(255,210,63,0.55); }
+.btn-primary:active { transform: scale(0.95); opacity: 0.9; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* Secondary — Teal outline */
+.btn-secondary {
+  background: white;
+  color: var(--color-primary) !important;
+  font-weight: 700;
+  border: 2.5px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  min-height: 44px;
+  padding: 0 var(--space-md);
+  box-shadow: var(--shadow-teal-glow);
+  transition: transform 0.2s var(--ease-bounce), background 0.15s ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover  { background: var(--color-primary-bg); }
+.btn-secondary:active { transform: scale(0.96); }
+
+/* Flip7 Input Style */
+.flip7-input {
+  background: var(--color-cream);
+  border: 2px solid rgba(43,168,162,0.20);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-dark);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+
+.flip7-input::placeholder { color: var(--color-text-light); }
+
+.flip7-input:focus {
+  outline: none;
+  border-color: var(--color-sky);
+  box-shadow: var(--shadow-focus);
+}
+
+/* Section title with dashed underline */
+.flip7-section-title {
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding-bottom: 8px;
+  border-bottom: 2.5px dashed var(--color-primary-light);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Teal loader spinner */
+.flip7-spinner {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 4px solid var(--color-primary-bg);
+  border-top-color: var(--color-primary);
+  animation: flip7-spin 0.75s linear infinite;
+}
+
+/* Badge pills */
+.badge-teal {
+  background: var(--color-primary-bg);
+  color: var(--color-primary-dark);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid rgba(43,168,162,0.2);
+}
+
+.badge-gold {
+  background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold));
+  color: #2C3E50;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+}
+
+.badge-coral {
+  background: rgba(239,108,74,0.12);
+  color: var(--color-coral-dark);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid rgba(239,108,74,0.2);
+}
+
+/* Progress bar track/fill */
+.flip7-progress-track {
+  height: 8px;
+  background: #E8F6F5;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.flip7-progress-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--color-primary-light), var(--color-primary));
+  transition: width 0.5s ease;
+}
+
+/* Fade-up animation on mount */
+.animate-fade-up {
+  animation: fade-up 0.4s ease forwards;
+}
