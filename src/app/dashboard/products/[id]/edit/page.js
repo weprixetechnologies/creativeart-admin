@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import apiClient from '../../../../../lib/api-client';
-import { 
-  ArrowLeft, 
-  Loader, 
+import {
+  ArrowLeft,
+  Loader,
   AlertTriangle,
   Save,
   Package,
@@ -230,7 +230,7 @@ export default function EditProductPage() {
         const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
         const uploadKey = `product-assets/${id}/${fileName}`;
 
-        const appUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+        const appUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.thecreativeart.shop/api/v1';
         const proxyUrl = `${appUrl}/storage/upload?key=${encodeURIComponent(uploadKey)}&contentType=${encodeURIComponent(file.type)}`;
 
         const uploadRes = await fetch(proxyUrl, {
@@ -553,8 +553,8 @@ export default function EditProductPage() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Top Breadcrumb */}
-      <Link 
-        href="/dashboard/products" 
+      <Link
+        href="/dashboard/products"
         className="flex items-center text-xs text-zinc-400 hover:text-white transition-colors"
       >
         <ArrowLeft className="w-4 h-4 mr-1.5" /> Back to Catalog Listing
@@ -591,8 +591,8 @@ export default function EditProductPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`
                 px-4 py-2 text-xs font-bold rounded-xl transition-all uppercase tracking-wide cursor-pointer
-                ${activeTab === tab.id 
-                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/10' 
+                ${activeTab === tab.id
+                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/10'
                   : 'text-zinc-400 hover:text-zinc-200'}
               `}
             >
@@ -618,7 +618,7 @@ export default function EditProductPage() {
 
       {/* Workspace panel */}
       <div className="bg-zinc-900/30 border border-zinc-800/80 rounded-3xl p-6 sm:p-8">
-        
+
         {/* --- TAB 1: BASIC INFO --- */}
         {activeTab === 'basic' && (
           <form onSubmit={handleBasicSubmit} className="space-y-6">
@@ -697,8 +697,8 @@ export default function EditProductPage() {
                     onClick={() => setBasicForm(prev => ({ ...prev, status: st }))}
                     className={`
                       py-3 text-xs font-bold rounded-xl border uppercase tracking-wider cursor-pointer
-                      ${basicForm.status === st 
-                        ? 'bg-purple-600/10 border-purple-500 text-purple-400' 
+                      ${basicForm.status === st
+                        ? 'bg-purple-600/10 border-purple-500 text-purple-400'
                         : 'bg-zinc-950 border-zinc-850 text-zinc-500 hover:text-zinc-300'}
                     `}
                   >
@@ -751,11 +751,10 @@ export default function EditProductPage() {
                 {uploadProgress.length > 0 && (
                   <div className="space-y-1.5 mt-1">
                     {uploadProgress.map((p, i) => (
-                      <div key={i} className={`flex items-center gap-2 text-[10px] rounded-lg px-3 py-1.5 ${
-                        p.status === 'done' ? 'bg-emerald-500/10 text-emerald-400' :
-                        p.status === 'error' ? 'bg-rose-500/10 text-rose-400' :
-                        'bg-zinc-800/60 text-zinc-400'
-                      }`}>
+                      <div key={i} className={`flex items-center gap-2 text-[10px] rounded-lg px-3 py-1.5 ${p.status === 'done' ? 'bg-emerald-500/10 text-emerald-400' :
+                          p.status === 'error' ? 'bg-rose-500/10 text-rose-400' :
+                            'bg-zinc-800/60 text-zinc-400'
+                        }`}>
                         <span className="shrink-0">
                           {p.status === 'done' ? '✓' : p.status === 'error' ? '✗' : '⋯'}
                         </span>
@@ -796,7 +795,7 @@ export default function EditProductPage() {
             {/* Images list */}
             <div className="space-y-3">
               <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Gallery Assets ({images.length})</h3>
-              
+
               {images.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 border border-dashed border-zinc-800 rounded-3xl text-zinc-600">
                   <ImageIcon className="w-10 h-10 mb-2" />
@@ -805,16 +804,16 @@ export default function EditProductPage() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {images.map((img) => (
-                    <div 
+                    <div
                       key={img.id}
                       className="group bg-zinc-950 border border-zinc-850 rounded-2xl overflow-hidden p-3 relative hover:border-zinc-700 transition-colors"
                     >
                       {/* Image Preview Box */}
                       <div className="w-full h-40 bg-zinc-900 border border-zinc-800/80 rounded-xl flex items-center justify-center overflow-hidden relative">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img 
-                          src={img.url} 
-                          alt="Asset preview" 
+                        <img
+                          src={img.url}
+                          alt="Asset preview"
                           className="object-cover w-full h-full"
                         />
                         {img.is_primary === 1 && (
@@ -827,7 +826,7 @@ export default function EditProductPage() {
                       {/* Info and Actions */}
                       <div className="mt-3 flex justify-between items-center">
                         <span className="text-[9px] text-zinc-500 font-semibold font-mono">Order: {img.sort_order}</span>
-                        
+
                         <div className="flex items-center space-x-1">
                           {/* Reorders */}
                           <button
@@ -988,7 +987,7 @@ export default function EditProductPage() {
                   <h4 className="text-[11px] font-extrabold text-zinc-400 uppercase tracking-widest">
                     Generated Combinations Matrix ({generatedRows.length})
                   </h4>
-                  
+
                   <div className="border border-zinc-855 rounded-2xl overflow-hidden max-h-[300px] overflow-y-auto">
                     <table className="w-full text-left border-collapse text-[11px] text-zinc-350">
                       <thead className="bg-zinc-900/80 border-b border-zinc-800 text-zinc-500 font-bold uppercase sticky top-0">
@@ -1082,7 +1081,7 @@ export default function EditProductPage() {
             {/* Create Single Variant Form */}
             <form onSubmit={handleAddVariant} className="space-y-4 bg-zinc-950/40 border border-zinc-800 rounded-3xl p-5">
               <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Add Single Variant (Manual)</h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-zinc-500 uppercase">Variant SKU</label>
@@ -1150,7 +1149,7 @@ export default function EditProductPage() {
             {/* List Existing Variants */}
             <div className="space-y-3">
               <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Product Variant Matrix ({variants.length})</h3>
-              
+
               {variants.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 border border-dashed border-zinc-800 rounded-3xl text-zinc-650">
                   <Settings className="w-10 h-10 mb-2 animate-spin-slow" />
@@ -1215,7 +1214,7 @@ export default function EditProductPage() {
         {activeTab === 'fields' && isCustomisable && (
           <div className="space-y-8 animate-in fade-in duration-200">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-              
+
               {/* Configuration Builder */}
               <div className="space-y-6">
                 <form onSubmit={handleAddField} className="space-y-4 bg-zinc-950/40 border border-zinc-800 rounded-3xl p-5">
@@ -1354,7 +1353,7 @@ export default function EditProductPage() {
                         <div key={f.id} className="flex justify-between items-center bg-zinc-950 border border-zinc-850 p-4 rounded-2xl hover:border-zinc-800 transition-colors">
                           <div>
                             <p className="font-semibold text-xs text-white flex items-center">
-                              {f.label} 
+                              {f.label}
                               {f.required === 1 && <span className="text-[8px] bg-rose-600/10 text-rose-500 border border-rose-900/10 px-1 rounded ml-2">Required</span>}
                             </p>
                             <p className="text-[10px] text-zinc-500 font-mono mt-1">Key: {f.field_key} • Format: {f.type}</p>
@@ -1393,10 +1392,10 @@ export default function EditProductPage() {
                             {field.label}
                             {field.required === 1 && <span className="text-rose-500 ml-1 font-semibold">*</span>}
                           </label>
-                          
+
                           {field.type === 'TEXT' && (
-                            <input 
-                              type="text" 
+                            <input
+                              type="text"
                               placeholder={`Input ${field.label.toLowerCase()}...`}
                               className="w-full bg-zinc-950 border border-zinc-800/80 rounded-xl px-4 py-3 text-xs text-white"
                               disabled
@@ -1404,8 +1403,8 @@ export default function EditProductPage() {
                           )}
 
                           {field.type === 'NUMBER' && (
-                            <input 
-                              type="number" 
+                            <input
+                              type="number"
                               placeholder="0"
                               className="w-full bg-zinc-950 border border-zinc-800/80 rounded-xl px-4 py-3 text-xs text-white"
                               disabled
@@ -1414,8 +1413,8 @@ export default function EditProductPage() {
 
                           {field.type === 'DATE' && (
                             <div className="relative">
-                              <input 
-                                type="date" 
+                              <input
+                                type="date"
                                 className="w-full bg-zinc-950 border border-zinc-800/80 rounded-xl px-4 py-3 text-xs text-white"
                                 disabled
                               />
@@ -1423,7 +1422,7 @@ export default function EditProductPage() {
                           )}
 
                           {field.type === 'DROPDOWN' && (
-                            <select 
+                            <select
                               className="w-full bg-zinc-950 border border-zinc-800/80 rounded-xl px-4 py-3 text-xs text-white appearance-none"
                               disabled
                             >
@@ -1435,7 +1434,7 @@ export default function EditProductPage() {
                           )}
 
                           {field.type === 'TEXTAREA' && (
-                            <textarea 
+                            <textarea
                               rows={2}
                               placeholder={`Type detailed ${field.label.toLowerCase()}...`}
                               className="w-full bg-zinc-950 border border-zinc-800/80 rounded-xl px-4 py-3 text-xs text-white resize-none"

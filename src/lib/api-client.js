@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.thecreativeart.shop/api/v1';
 
 class ApiError extends Error {
   constructor(message, code, status) {
@@ -23,7 +23,7 @@ function onRefreshed(token) {
 
 async function request(path, options = {}) {
   const url = `${API_BASE_URL}${path}`;
-  
+
   // Get stored tokens
   const token = typeof window !== 'undefined' ? localStorage.getItem('adminAccessToken') : null;
 
