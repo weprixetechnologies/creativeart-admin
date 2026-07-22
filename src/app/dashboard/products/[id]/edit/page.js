@@ -38,9 +38,23 @@ export default function EditProductPage() {
   // Loaded Product Data
   const [product, setProduct] = useState(null);
 
+  // Helper for safe JSON attribute parsing
+  const safeParseAttrs = (attr) => {
+    if (!attr) return {};
+    if (typeof attr === 'object') return attr;
+    try {
+      const parsed = JSON.parse(attr);
+      return typeof parsed === 'object' && parsed !== null ? parsed : {};
+    } catch (e) {
+      return {};
+    }
+  };
+
   // Tab 1: Basic Info Form States
   const [basicForm, setBasicForm] = useState({
     categoryId: '',
+    itemType: 'PRODUCT',
+    productType: 'SIMPLE',
     name: '',
     slug: '',
     description: '',
@@ -129,16 +143,44 @@ export default function EditProductPage() {
       // Load Form states
       setBasicForm({
         categoryId: String(details.category_id),
+        itemType: details.item_type || 'PRODUCT',
+        productType: details.product_type || 'SIMPLE',
         name: details.name,
         slug: details.slug,
         description: details.description,
-        basePrice: details.base_price,
+basePrice: details.base_price,
         status: details.status
       });
 
       setImages(details.images || []);
-      setVariants(details.variants || []);
+      const loadedVariants = details.variants || [];
+      setVariants(loadedVariants);
       setCustomFields(details.customFields || []);
+
+      // Auto-set default bulk SKU prefix from slug or ID
+      const defaultPrefix = details.slug
+        ? details.slug.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10)
+        : `P${details.id}`;
+      setBulkSkuPrefix(defaultPrefix);
+
+      // Reconstruct attributes list from existing variants if available
+      if (loadedVariants.length > 0) {
+        const extractedMap = {};
+        loadedVariants.forEach(v => {
+          const attrs = safeParseAttrs(v.attributes);
+          Object.entries(attrs).forEach(([k, val]) => {
+            if (!extractedMap[k]) extractedMap[k] = new Set();
+            if (val !== undefined && val !== null) extractedMap[k].add(String(val));
+          });
+        });
+        const reconstructed = Object.entries(extractedMap).map(([k, setVal]) => ({
+          name: k,
+          values: Array.from(setVal).join(', ')
+        }));
+        if (reconstructed.length > 0) {
+          setAttributesList(reconstructed);
+        }
+      }
 
       setFulfillmentForm({
         advanceAmount: details.advance_amount || '',
@@ -162,14 +204,22 @@ export default function EditProductPage() {
     try {
       const payload = {
         categoryId: parseInt(basicForm.categoryId, 10),
+        itemType: basicForm.itemType,
+        productType: basicForm.itemType === 'PROJECT' ? null : basicForm.productType,
         name: basicForm.name,
         slug: basicForm.slug,
         description: basicForm.description,
         basePrice: parseFloat(basicForm.basePrice) || 0,
         status: basicForm.status
       };
-      await apiClient.put(`/admin/products/${id}`, payload);
-      setSuccess('Basic information updated successfully!');
+      const updated = await apiClient.put(`/admin/products/${id}`, payload);
+      setProduct(prev => ({
+        ...prev,
+        ...updated,
+        product_type: payload.productType,
+        item_type: payload.itemType
+      }));
+      setSuccess('Basic information and product type updated successfully!');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError(err.message || 'Failed to update basic info.');
@@ -375,9 +425,14 @@ export default function EditProductPage() {
 
     const combinations = cartesian(attrCombinations);
 
+    const fallbackPrefix = product?.slug 
+      ? product.slug.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10) 
+      : `P${id}`;
+    const effectivePrefix = (bulkSkuPrefix ? bulkSkuPrefix.trim().toUpperCase() : fallbackPrefix);
+
     const rows = combinations.map(combo => {
-      const vals = Object.values(combo).map(v => v.toUpperCase().replace(/[^A-Z0-9]/g, ''));
-      const generatedSku = `${bulkSkuPrefix ? bulkSkuPrefix.toUpperCase() : 'SKU'}-${vals.join('-')}`;
+      const vals = Object.values(combo).map(v => String(v).toUpperCase().replace(/[^A-Z0-9]/g, ''));
+      const generatedSku = `${effectivePrefix}-${vals.join('-')}`;
       return {
         sku: generatedSku,
         attributes: combo,
@@ -396,6 +451,8 @@ export default function EditProductPage() {
     setSuccess('');
     let successCount = 0;
     let failCount = 0;
+    let failMsg = '';
+
     try {
       for (const row of generatedRows) {
         try {
@@ -410,6 +467,7 @@ export default function EditProductPage() {
         } catch (e) {
           console.error('Failed to create bulk variant SKU:', row.sku, e);
           failCount++;
+          if (e.message) failMsg = e.message;
         }
       }
       // Refetch variants
@@ -417,7 +475,7 @@ export default function EditProductPage() {
       setVariants(list);
       setGeneratedRows([]);
       if (failCount > 0) {
-        setError(`Successfully added ${successCount} variants. ${failCount} failed (likely SKU duplicate).`);
+        setError(`Added ${successCount} variants. ${failCount} failed (${failMsg || 'likely SKU duplicate'}).`);
       } else {
         setSuccess(`Successfully generated all ${successCount} variations!`);
         setTimeout(() => setSuccess(''), 3000);
@@ -675,6 +733,35 @@ export default function EditProductPage() {
                 />
               </div>
             </div>
+
+            {/* Product Type Selector (shown if itemType is PRODUCT) */}
+            {basicForm.itemType === 'PRODUCT' && (
+              <div className="space-y-2 pt-1">
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Product Type Mode</label>
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { type: 'SIMPLE', title: 'Simple Product', desc: 'No size/color choices, flat price.' },
+                    { type: 'VARIABLE', title: 'Variable Product', desc: 'Includes size, color, SKU options.' },
+                    { type: 'CUSTOMISABLE', title: 'Customisable Template', desc: 'Requires customer engraving or text inputs.' }
+                  ].map((opt) => (
+                    <button
+                      key={opt.type}
+                      type="button"
+                      onClick={() => setBasicForm(prev => ({ ...prev, productType: opt.type }))}
+                      className={`
+                        p-3.5 text-left rounded-2xl border text-xs transition-all duration-150 flex flex-col justify-between cursor-pointer
+                        ${basicForm.productType === opt.type 
+                          ? 'bg-purple-600/10 border-purple-500 text-white' 
+                          : 'bg-zinc-950 border-zinc-850 text-zinc-400 hover:text-zinc-200'}
+                      `}
+                    >
+                      <span className="font-bold">{opt.title}</span>
+                      <span className="text-[9px] text-zinc-500 mt-1 leading-normal">{opt.desc}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Description</label>
@@ -1169,7 +1256,7 @@ export default function EditProductPage() {
                     </thead>
                     <tbody className="divide-y divide-zinc-900">
                       {variants.map((v) => {
-                        const attrs = typeof v.attributes === 'string' ? JSON.parse(v.attributes) : v.attributes;
+                        const attrs = safeParseAttrs(v.attributes);
                         return (
                           <tr key={v.id} className="hover:bg-white/5 transition-colors">
                             <td className="px-5 py-3 font-semibold text-white font-mono">{v.sku}</td>
