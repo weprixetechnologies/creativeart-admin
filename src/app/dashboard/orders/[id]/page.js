@@ -20,44 +20,44 @@ import {
 } from 'lucide-react';
 
 const STATUS_META = {
-  PLACED:                     { label: 'Placed',                  color: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
-  PAID:                       { label: 'Paid',                    color: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' },
-  PACKED:                     { label: 'Packed',                  color: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/20' },
-  SHIPPED:                    { label: 'Shipped',                 color: 'bg-violet-500/15 text-violet-400 border-violet-500/20' },
-  DELIVERED:                  { label: 'Delivered',               color: 'bg-teal-500/15 text-teal-400 border-teal-500/20' },
-  CANCELLED:                  { label: 'Cancelled',               color: 'bg-rose-500/15 text-rose-400 border-rose-500/20' },
-  REFUNDED:                   { label: 'Refunded',                color: 'bg-orange-500/15 text-orange-400 border-orange-500/20' },
-  RTO:                        { label: 'RTO',                     color: 'bg-amber-500/15 text-amber-400 border-amber-500/20' },
-  EXCEPTION:                  { label: 'Exception',               color: 'bg-red-500/15 text-red-400 border-red-500/20' },
-  BOOKED_PENDING_ADVANCE:     { label: 'Pending Advance',         color: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20' },
-  ADVANCE_PAID:               { label: 'Advance Paid',            color: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' },
-  AWAITING_MATERIAL_DISPATCH: { label: 'Awaiting Material',       color: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
-  MATERIAL_IN_TRANSIT:        { label: 'Material In Transit',     color: 'bg-violet-500/15 text-violet-400 border-violet-500/20' },
-  MATERIAL_RECEIVED:          { label: 'Material Received',       color: 'bg-teal-500/15 text-teal-400 border-teal-500/20' },
-  IN_PRODUCTION:              { label: 'In Production',           color: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/20' },
-  READY_PENDING_FINAL_PAYMENT:{ label: 'Ready – Final Payment',   color: 'bg-amber-500/15 text-amber-400 border-amber-500/20' },
-  FINAL_PAID:                 { label: 'Final Paid',              color: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' },
-  ON_HOLD:                    { label: 'On Hold',                 color: 'bg-zinc-500/15 text-zinc-400 border-zinc-500/20' },
+  PLACED: { label: 'Placed', color: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
+  PAID: { label: 'Paid', color: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' },
+  PACKED: { label: 'Packed', color: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/20' },
+  SHIPPED: { label: 'Shipped', color: 'bg-violet-500/15 text-violet-400 border-violet-500/20' },
+  DELIVERED: { label: 'Delivered', color: 'bg-teal-500/15 text-teal-400 border-teal-500/20' },
+  CANCELLED: { label: 'Cancelled', color: 'bg-rose-500/15 text-rose-400 border-rose-500/20' },
+  REFUNDED: { label: 'Refunded', color: 'bg-orange-500/15 text-orange-400 border-orange-500/20' },
+  RTO: { label: 'RTO', color: 'bg-amber-500/15 text-amber-400 border-amber-500/20' },
+  EXCEPTION: { label: 'Exception', color: 'bg-red-500/15 text-red-400 border-red-500/20' },
+  BOOKED_PENDING_ADVANCE: { label: 'Pending Advance', color: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20' },
+  ADVANCE_PAID: { label: 'Advance Paid', color: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' },
+  AWAITING_MATERIAL_DISPATCH: { label: 'Awaiting Material', color: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
+  MATERIAL_IN_TRANSIT: { label: 'Material In Transit', color: 'bg-violet-500/15 text-violet-400 border-violet-500/20' },
+  MATERIAL_RECEIVED: { label: 'Material Received', color: 'bg-teal-500/15 text-teal-400 border-teal-500/20' },
+  IN_PRODUCTION: { label: 'In Production', color: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/20' },
+  READY_PENDING_FINAL_PAYMENT: { label: 'Ready – Final Payment', color: 'bg-amber-500/15 text-amber-400 border-amber-500/20' },
+  FINAL_PAID: { label: 'Final Paid', color: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' },
+  ON_HOLD: { label: 'On Hold', color: 'bg-zinc-500/15 text-zinc-400 border-zinc-500/20' },
 };
 
 // Legal transitions for admin to trigger manually
 const ADMIN_TRANSITIONS = {
   STANDARD: {
-    PLACED:   ['CANCELLED'],
-    PAID:     ['PACKED', 'REFUNDED'],
-    PACKED:   ['SHIPPED'],
-    SHIPPED:  ['DELIVERED', 'RTO', 'EXCEPTION'],
+    PLACED: ['CANCELLED'],
+    PAID: ['PACKED', 'REFUNDED'],
+    PACKED: ['SHIPPED'],
+    SHIPPED: ['DELIVERED', 'RTO', 'EXCEPTION'],
   },
   DUAL_PAYMENT: {
     AWAITING_MATERIAL_DISPATCH: ['ON_HOLD', 'CANCELLED'],
-    MATERIAL_IN_TRANSIT:        ['MATERIAL_RECEIVED', 'ON_HOLD', 'CANCELLED'],
-    MATERIAL_RECEIVED:          ['IN_PRODUCTION', 'ON_HOLD', 'CANCELLED'],
-    IN_PRODUCTION:              ['READY_PENDING_FINAL_PAYMENT', 'ON_HOLD', 'CANCELLED'],
-    READY_PENDING_FINAL_PAYMENT:['ON_HOLD', 'CANCELLED'],
-    FINAL_PAID:                 ['PACKED', 'ON_HOLD', 'CANCELLED'],
-    PACKED:                     ['SHIPPED', 'ON_HOLD', 'CANCELLED'],
-    SHIPPED:                    ['DELIVERED', 'RTO', 'EXCEPTION'],
-    ON_HOLD:                    ['CANCELLED'],
+    MATERIAL_IN_TRANSIT: ['MATERIAL_RECEIVED', 'ON_HOLD', 'CANCELLED'],
+    MATERIAL_RECEIVED: ['IN_PRODUCTION', 'ON_HOLD', 'CANCELLED'],
+    IN_PRODUCTION: ['READY_PENDING_FINAL_PAYMENT', 'ON_HOLD', 'CANCELLED'],
+    READY_PENDING_FINAL_PAYMENT: ['ON_HOLD', 'CANCELLED'],
+    FINAL_PAID: ['PACKED', 'ON_HOLD', 'CANCELLED'],
+    PACKED: ['SHIPPED', 'ON_HOLD', 'CANCELLED'],
+    SHIPPED: ['DELIVERED', 'RTO', 'EXCEPTION'],
+    ON_HOLD: ['CANCELLED'],
   }
 };
 
@@ -305,10 +305,10 @@ export default function AdminOrderDetailPage() {
       {/* Pricing Summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Subtotal',   val: order.subtotal },
-          { label: 'Discount',   val: order.discountAmount },
-          { label: 'Tax',        val: order.taxAmount },
-          { label: 'Total',      val: order.totalAmount, highlight: true },
+          { label: 'Subtotal', val: order.subtotal },
+          { label: 'Discount', val: order.discountAmount },
+          { label: 'Tax', val: order.taxAmount },
+          { label: 'Total', val: order.totalAmount, highlight: true },
         ].map(({ label, val, highlight }) => (
           <div key={label} className={`bg-zinc-900 border rounded-2xl p-4 ${highlight ? 'border-purple-500/30' : 'border-zinc-800'}`}>
             <p className="text-xs text-zinc-500 mb-1">{label}</p>
@@ -317,6 +317,7 @@ export default function AdminOrderDetailPage() {
             </p>
           </div>
         ))}
+      </div>
       {/* Shipping Details */}
       {(order.awbNumber || order.courierName || order.expectedDeliveryDate) && (
         <Section title="Manual Shipping Details" icon={Truck}>
@@ -383,22 +384,22 @@ export default function AdminOrderDetailPage() {
           ) : order.payments?.map(pay => {
             const pStatus = getPaymentStatusDisplay(pay.status);
             return (
-            <div key={pay.id} className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-zinc-400 uppercase">{pay.paymentType} payment</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-semibold border ${pStatus.color}`}>
-                    {pStatus.label}
-                  </span>
+              <div key={pay.id} className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-zinc-400 uppercase">{pay.paymentType} payment</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-semibold border ${pStatus.color}`}>
+                      {pStatus.label}
+                    </span>
+                  </div>
+                  {pay.gatewayPaymentId && (
+                    <p className="text-xs text-zinc-600 mt-0.5 font-mono">{pay.gatewayPaymentId}</p>
+                  )}
                 </div>
-                {pay.gatewayPaymentId && (
-                  <p className="text-xs text-zinc-600 mt-0.5 font-mono">{pay.gatewayPaymentId}</p>
-                )}
+                <p className="text-sm font-bold text-white">
+                  ₹{parseFloat(pay.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                </p>
               </div>
-              <p className="text-sm font-bold text-white">
-                ₹{parseFloat(pay.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-              </p>
-            </div>
             );
           })}
         </div>
@@ -556,5 +557,5 @@ export default function AdminOrderDetailPage() {
         </div>
       )}
     </div>
-  );
+  )
 }
