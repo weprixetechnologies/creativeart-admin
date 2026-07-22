@@ -752,8 +752,8 @@ export default function EditProductPage() {
                   <div className="space-y-1.5 mt-1">
                     {uploadProgress.map((p, i) => (
                       <div key={i} className={`flex items-center gap-2 text-[10px] rounded-lg px-3 py-1.5 ${p.status === 'done' ? 'bg-emerald-500/10 text-emerald-400' :
-                          p.status === 'error' ? 'bg-rose-500/10 text-rose-400' :
-                            'bg-zinc-800/60 text-zinc-400'
+                        p.status === 'error' ? 'bg-rose-500/10 text-rose-400' :
+                          'bg-zinc-800/60 text-zinc-400'
                         }`}>
                         <span className="shrink-0">
                           {p.status === 'done' ? '✓' : p.status === 'error' ? '✗' : '⋯'}

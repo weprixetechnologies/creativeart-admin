@@ -15,7 +15,8 @@ import {
   CheckCircle2,
   ChevronDown,
   Download,
-  RefreshCw
+  RefreshCw,
+  Truck
 } from 'lucide-react';
 
 const STATUS_META = {
@@ -108,6 +109,12 @@ export default function AdminOrderDetailPage() {
   const [packLoading, setPackLoading] = useState(false);
   const [paymentCheckLoading, setPaymentCheckLoading] = useState(false);
 
+  // Manual Shipping state
+  const [manualShipOpen, setManualShipOpen] = useState(false);
+  const [manualShipForm, setManualShipForm] = useState({ awbNumber: '', courierName: '', expectedDeliveryDate: '' });
+  const [manualShipLoading, setManualShipLoading] = useState(false);
+  const [manualShipError, setManualShipError] = useState(null);
+
   const fetchOrder = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -180,6 +187,24 @@ export default function AdminOrderDetailPage() {
     }
   };
 
+  const handleManualShipSubmit = async () => {
+    setManualShipLoading(true);
+    setManualShipError(null);
+    try {
+      await apiClient.post(`/admin/orders/${orderId}/update-manual-shipping`, {
+        awbNumber: manualShipForm.awbNumber,
+        courierName: manualShipForm.courierName,
+        expectedDeliveryDate: manualShipForm.expectedDeliveryDate || null,
+      });
+      setManualShipOpen(false);
+      await fetchOrder();
+    } catch (err) {
+      setManualShipError(err.message);
+    } finally {
+      setManualShipLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-64">
@@ -247,6 +272,19 @@ export default function AdminOrderDetailPage() {
               Update Status <ChevronDown className="w-3.5 h-3.5" />
             </button>
           )}
+          <button
+            onClick={() => {
+              setManualShipForm({
+                awbNumber: order.awbNumber || '',
+                courierName: order.courierName || '',
+                expectedDeliveryDate: order.expectedDeliveryDate ? new Date(order.expectedDeliveryDate).toISOString().slice(0, 16) : ''
+              });
+              setManualShipOpen(true);
+            }}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition-colors"
+          >
+            <Truck className="w-4 h-4" /> Manual Shipping
+          </button>
           <a
             href={`/api/v1/orders/${orderId}/invoice`}
             target="_blank"
@@ -279,7 +317,25 @@ export default function AdminOrderDetailPage() {
             </p>
           </div>
         ))}
-      </div>
+      {/* Shipping Details */}
+      {(order.awbNumber || order.courierName || order.expectedDeliveryDate) && (
+        <Section title="Manual Shipping Details" icon={Truck}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-zinc-800/50 rounded-xl p-4 border border-zinc-700/50">
+              <p className="text-xs text-zinc-500 mb-1 font-semibold uppercase tracking-wider">Courier Name</p>
+              <p className="text-sm font-bold text-white">{order.courierName || '-'}</p>
+            </div>
+            <div className="bg-zinc-800/50 rounded-xl p-4 border border-zinc-700/50">
+              <p className="text-xs text-zinc-500 mb-1 font-semibold uppercase tracking-wider">AWB Number</p>
+              <p className="text-sm font-bold text-white">{order.awbNumber || '-'}</p>
+            </div>
+            <div className="bg-zinc-800/50 rounded-xl p-4 border border-zinc-700/50">
+              <p className="text-xs text-zinc-500 mb-1 font-semibold uppercase tracking-wider">Expected Delivery</p>
+              <p className="text-sm font-bold text-white">{order.expectedDeliveryDate ? new Date(order.expectedDeliveryDate).toLocaleDateString('en-IN') : '-'}</p>
+            </div>
+          </div>
+        </Section>
+      )}
 
       {/* Order Items */}
       <Section title="Order Items" icon={Package}>
@@ -430,6 +486,70 @@ export default function AdminOrderDetailPage() {
                 className="flex-1 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white rounded-xl text-sm font-semibold transition-colors"
               >
                 {overrideLoading ? 'Updating...' : 'Confirm Override'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Manual Shipping Modal */}
+      {manualShipOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-2xl w-full max-w-md p-6 space-y-5 shadow-2xl">
+            <h3 className="text-lg font-bold text-white">Manual Shipping details</h3>
+            <p className="text-sm text-zinc-400">
+              Update manual shipping tracking details for order <span className="text-indigo-400 font-medium">{order.orderNumber}</span>.
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-1">Courier Name</label>
+                <input
+                  type="text"
+                  value={manualShipForm.courierName}
+                  onChange={e => setManualShipForm({ ...manualShipForm, courierName: e.target.value })}
+                  placeholder="e.g. Delhivery, Bluedart"
+                  className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-1">AWB / Tracking Number</label>
+                <input
+                  type="text"
+                  value={manualShipForm.awbNumber}
+                  onChange={e => setManualShipForm({ ...manualShipForm, awbNumber: e.target.value })}
+                  placeholder="e.g. 1Z99999999"
+                  className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-1">Expected Delivery Date</label>
+                <input
+                  type="datetime-local"
+                  value={manualShipForm.expectedDeliveryDate}
+                  onChange={e => setManualShipForm({ ...manualShipForm, expectedDeliveryDate: e.target.value })}
+                  className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+            </div>
+
+            {manualShipError && (
+              <p className="text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2">{manualShipError}</p>
+            )}
+
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => setManualShipOpen(false)}
+                className="flex-1 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl text-sm font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleManualShipSubmit}
+                disabled={manualShipLoading}
+                className="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-xl text-sm font-semibold transition-colors"
+              >
+                {manualShipLoading ? 'Saving...' : 'Save Details'}
               </button>
             </div>
           </div>

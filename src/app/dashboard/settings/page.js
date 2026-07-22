@@ -15,12 +15,13 @@ import {
   Globe,
   Phone,
   Truck,
-  User
+  User,
+  CreditCard
 } from 'lucide-react';
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState('fulfillment');
-  const [settings, setSettings] = useState({ stuck_order_sweep_threshold_days: '14' });
+  const [activeTab, setActiveTab] = useState('payments');
+  const [settings, setSettings] = useState({ stuck_order_sweep_threshold_days: '14', cod_enabled: 'true' });
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -174,6 +175,7 @@ export default function SettingsPage() {
           {/* Tabs Sidebar */}
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-2.5 space-y-1 md:col-span-1">
             {[
+              { id: 'payments', label: 'Payments', icon: CreditCard },
               { id: 'fulfillment', label: 'Fulfillment', icon: Sliders },
               { id: 'office-addresses', label: 'Office Addresses', icon: MapPin },
               { id: 'shipping', label: 'Shipping', icon: Truck },
@@ -199,6 +201,52 @@ export default function SettingsPage() {
 
           {/* Tab Panel */}
           <div className="md:col-span-3">
+            {activeTab === 'payments' && (
+              <form onSubmit={saveSettings} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-6">
+                <div>
+                  <h2 className="text-base font-bold text-white mb-1 flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-purple-400" /> Payment Settings
+                  </h2>
+                  <p className="text-xs text-zinc-500">Configure accepted payment methods and gateways</p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-zinc-800/30 border border-zinc-800 rounded-xl">
+                    <div>
+                      <h3 className="text-sm font-semibold text-white">Cash on Delivery (COD)</h3>
+                      <p className="text-xs text-zinc-500 mt-1">Allow customers to pay via COD for standard orders</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer"
+                        checked={settings.cod_enabled === 'true'}
+                        onChange={(e) => setSettings(s => ({ ...s, cod_enabled: e.target.checked ? 'true' : 'false' }))}
+                      />
+                      <div className="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                    </label>
+                  </div>
+                </div>
+
+                {settingsSuccess && (
+                  <p className="text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4" /> Settings updated successfully.
+                  </p>
+                )}
+
+                <div className="flex justify-end pt-2 border-t border-zinc-850">
+                  <button
+                    type="submit"
+                    disabled={settingsLoading}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white rounded-xl text-xs font-bold transition-colors"
+                  >
+                    <Save className="w-4 h-4" />
+                    {settingsLoading ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </div>
+              </form>
+            )}
+
             {activeTab === 'fulfillment' && (
               <form onSubmit={saveSettings} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-6">
                 <div>

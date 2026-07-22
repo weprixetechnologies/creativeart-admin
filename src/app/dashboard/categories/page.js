@@ -34,10 +34,12 @@ export default function CategoriesPage() {
     slug: '',
     parentId: '',
     sortOrder: 0,
-    status: 'ACTIVE'
+    status: 'ACTIVE',
+    photoUrl: ''
   });
   const [formSubmitting, setFormSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Delete modal state
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -95,7 +97,8 @@ export default function CategoriesPage() {
       slug: '',
       parentId: parentId ? String(parentId) : '',
       sortOrder: 0,
-      status: 'ACTIVE'
+      status: 'ACTIVE',
+      photoUrl: ''
     });
     setFormError('');
     setFormOpen(true);
@@ -108,7 +111,8 @@ export default function CategoriesPage() {
       slug: category.slug,
       parentId: category.parent_id ? String(category.parent_id) : '',
       sortOrder: category.sort_order || 0,
-      status: category.status || 'ACTIVE'
+      status: category.status || 'ACTIVE',
+      photoUrl: category.photo_url || ''
     });
     setFormError('');
     setFormOpen(true);
@@ -123,6 +127,38 @@ export default function CategoriesPage() {
     setFormData(prev => ({ ...prev, name, slug }));
   };
 
+  const handleImageFileUpload = async (files) => {
+    if (!files || files.length === 0) return;
+    const file = files[0];
+    setUploadingImage(true);
+    setFormError('');
+
+    try {
+      const timestamp = Date.now();
+      const fileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const uploadKey = `categories/${timestamp}_${fileName}`;
+      const appUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+      const proxyUrl = `${appUrl}/storage/upload?key=${encodeURIComponent(uploadKey)}&contentType=${encodeURIComponent(file.type)}`;
+
+      const uploadRes = await fetch(proxyUrl, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+        },
+        body: file
+      });
+
+      if (!uploadRes.ok) throw new Error('Upload failed.');
+      const resJson = await uploadRes.json();
+      
+      setFormData(prev => ({ ...prev, photoUrl: resJson.data.fileUrl }));
+    } catch (err) {
+      setFormError(err.message || 'Failed to upload image.');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setFormError('');
@@ -133,7 +169,8 @@ export default function CategoriesPage() {
       slug: formData.slug,
       parentId: formData.parentId ? parseInt(formData.parentId, 10) : null,
       sortOrder: parseInt(formData.sortOrder, 10) || 0,
-      status: formData.status
+      status: formData.status,
+      photoUrl: formData.photoUrl || null
     };
 
     try {
@@ -218,9 +255,13 @@ export default function CategoriesPage() {
               {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </button>
 
-            {/* Icon */}
-            <div className={`p-2 rounded-xl border ${category.status === 'ACTIVE' ? 'bg-purple-950/10 border-purple-500/10 text-purple-400' : 'bg-zinc-950 border-zinc-800 text-zinc-600'}`}>
-              <Layers className="w-4 h-4" />
+            {/* Icon/Photo */}
+            <div className={`w-8 h-8 rounded-xl border flex items-center justify-center overflow-hidden ${category.status === 'ACTIVE' ? 'bg-purple-950/10 border-purple-500/10 text-purple-400' : 'bg-zinc-950 border-zinc-800 text-zinc-600'}`}>
+              {category.photo_url ? (
+                <img src={category.photo_url} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <Layers className="w-4 h-4" />
+              )}
             </div>
 
             {/* Labels */}
@@ -437,6 +478,28 @@ export default function CategoriesPage() {
                     onChange={(e) => setFormData(prev => ({ ...prev, sortOrder: e.target.value }))}
                     className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500"
                   />
+                </div>
+
+                {/* Photo Upload */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Category Photo (Optional)</label>
+                  {formData.photoUrl && (
+                    <div className="w-full h-32 bg-zinc-800 rounded-xl overflow-hidden mb-2">
+                      <img src={formData.photoUrl} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={uploadingImage}
+                      onChange={(e) => handleImageFileUpload(e.target.files)}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <div className={`w-full py-3 bg-zinc-950 border border-dashed border-zinc-700 rounded-xl flex items-center justify-center text-sm font-medium ${uploadingImage ? 'text-zinc-500' : 'text-purple-400'}`}>
+                      {uploadingImage ? 'Uploading...' : 'Choose Image'}
+                    </div>
+                  </div>
                 </div>
 
                 {/* Status */}

@@ -99,6 +99,8 @@ export default function DashboardLayout({ children }) {
   const allNavItems = [
     { name: 'Dashboard',        href: '/dashboard',                        icon: LayoutDashboard, roles: ['ADMIN', 'STAFF_PRODUCTION', 'STAFF_PACKAGING'], emoji: '🏠' },
     { name: 'Categories',       href: '/dashboard/categories',             icon: Layers,          roles: ['ADMIN'],                                        emoji: '🗂️' },
+    { name: 'Banners & Sliders',href: '/dashboard/banners',                icon: Layers,          roles: ['ADMIN'],                                        emoji: '🖼️' },
+    { name: 'Imagerized Sections', href: '/dashboard/imagerized-sections', icon: Layers,          roles: ['ADMIN'],                                        emoji: '🖼️' },
     { name: 'Catalog Items',    href: '/dashboard/products',               icon: Package,         roles: ['ADMIN'],                                        emoji: '🎨' },
     { name: 'Orders List',      href: '/dashboard/orders',                 icon: Package,         roles: ['ADMIN', 'STAFF_PACKAGING'],                     emoji: '📦' },
     { name: 'Coupons',          href: '/dashboard/coupons',                icon: Layers,          roles: ['ADMIN'],                                        emoji: '🎟️' },
