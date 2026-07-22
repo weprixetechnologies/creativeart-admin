@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import apiClient from '../../../lib/api-client';
-import { 
-  Plus, 
-  Edit2, 
-  Trash2, 
-  ChevronRight, 
-  ChevronDown, 
-  ArrowUp, 
-  ArrowDown, 
-  Layers, 
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  ChevronRight,
+  ChevronDown,
+  ArrowUp,
+  ArrowDown,
+  Layers,
   FolderPlus,
   Loader,
   AlertTriangle,
@@ -22,7 +22,7 @@ export default function CategoriesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   // Expanded node states
   const [expandedIds, setExpandedIds] = useState({});
 
@@ -58,7 +58,7 @@ export default function CategoriesPage() {
     try {
       const data = await apiClient.get('/categories');
       setCategories(data);
-      
+
       // Build a flat list helper
       const flat = [];
       const flatten = (items, depth = 0) => {
@@ -137,7 +137,7 @@ export default function CategoriesPage() {
       const timestamp = Date.now();
       const fileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
       const uploadKey = `categories/${timestamp}_${fileName}`;
-      const appUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+      const appUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.thecreativeart.shop/api/v1';
       const proxyUrl = `${appUrl}/storage/upload?key=${encodeURIComponent(uploadKey)}&contentType=${encodeURIComponent(file.type)}`;
 
       const uploadRes = await fetch(proxyUrl, {
@@ -150,7 +150,7 @@ export default function CategoriesPage() {
 
       if (!uploadRes.ok) throw new Error('Upload failed.');
       const resJson = await uploadRes.json();
-      
+
       setFormData(prev => ({ ...prev, photoUrl: resJson.data.fileUrl }));
     } catch (err) {
       setFormError(err.message || 'Failed to upload image.');
@@ -212,7 +212,7 @@ export default function CategoriesPage() {
     // Find neighbors in flatCategories on the same parent level
     const siblings = flatCategories.filter(cat => cat.parent_id === category.parent_id);
     const index = siblings.findIndex(cat => cat.id === category.id);
-    
+
     if (direction === 'up' && index > 0) {
       const neighbor = siblings[index - 1];
       await swapSortOrder(category, neighbor);
@@ -241,13 +241,13 @@ export default function CategoriesPage() {
     return (
       <div key={category.id} className="select-none">
         {/* Row element */}
-        <div 
+        <div
           className="group flex items-center justify-between py-3.5 px-4 my-1 bg-zinc-900/40 border border-zinc-800/40 hover:bg-zinc-800/30 hover:border-zinc-700/35 rounded-2xl transition-all duration-150"
           style={{ marginLeft: `${depth * 28}px` }}
         >
           <div className="flex items-center space-x-3 min-w-0">
             {/* Collapse toggle */}
-            <button 
+            <button
               onClick={() => toggleExpand(category.id)}
               className={`p-1 text-zinc-500 hover:text-zinc-300 hover:bg-white/5 rounded-lg transition-colors ${!hasChildren && 'opacity-0 cursor-default'}`}
               disabled={!hasChildren}
@@ -279,14 +279,14 @@ export default function CategoriesPage() {
           {/* Action buttons */}
           <div className="flex items-center space-x-1.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150">
             {/* Sort order actions */}
-            <button 
+            <button
               onClick={() => handleMove(category, 'up')}
               className="p-2 bg-zinc-950 border border-zinc-850 text-zinc-400 hover:text-white rounded-xl hover:bg-zinc-800"
               title="Move Up"
             >
               <ArrowUp className="w-3.5 h-3.5" />
             </button>
-            <button 
+            <button
               onClick={() => handleMove(category, 'down')}
               className="p-2 bg-zinc-950 border border-zinc-850 text-zinc-400 hover:text-white rounded-xl hover:bg-zinc-800"
               title="Move Down"
@@ -295,7 +295,7 @@ export default function CategoriesPage() {
             </button>
 
             {/* Add child */}
-            <button 
+            <button
               onClick={() => openCreateModal(category.id)}
               className="p-2 bg-zinc-950 border border-zinc-850 text-purple-400 hover:text-purple-300 rounded-xl hover:bg-zinc-850"
               title="Add Subcategory"
@@ -304,7 +304,7 @@ export default function CategoriesPage() {
             </button>
 
             {/* Edit */}
-            <button 
+            <button
               onClick={() => openEditModal(category)}
               className="p-2 bg-zinc-950 border border-zinc-850 text-amber-400 hover:text-amber-300 rounded-xl hover:bg-zinc-855"
               title="Edit Category"
@@ -313,7 +313,7 @@ export default function CategoriesPage() {
             </button>
 
             {/* Delete */}
-            <button 
+            <button
               onClick={() => setDeleteTarget(category)}
               className="p-2 bg-zinc-950 border border-zinc-850 text-rose-400 hover:text-rose-300 rounded-xl hover:bg-rose-500/10 hover:border-rose-500/20"
               title="Delete Category"
@@ -327,9 +327,9 @@ export default function CategoriesPage() {
         {hasChildren && isExpanded && (
           <div className="relative">
             {/* Visual connector line */}
-            <div 
-              className="absolute left-6 top-1 bottom-1 w-px bg-zinc-800/40" 
-              style={{ marginLeft: `${depth * 28}px` }} 
+            <div
+              className="absolute left-6 top-1 bottom-1 w-px bg-zinc-800/40"
+              style={{ marginLeft: `${depth * 28}px` }}
             />
             {category.children.map(child => renderCategoryNode(child, depth + 1))}
           </div>
@@ -399,7 +399,7 @@ export default function CategoriesPage() {
         <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm">
           {/* Overlay dismissal */}
           <div className="flex-1" onClick={() => setFormOpen(false)} />
-          
+
           {/* Panel content */}
           <div className="w-full max-w-md bg-zinc-900 border-l border-zinc-800 p-8 flex flex-col justify-between animate-in slide-in-from-right duration-200">
             <div className="space-y-6">
@@ -407,7 +407,7 @@ export default function CategoriesPage() {
                 <h2 className="text-lg font-bold text-white">
                   {editingCategory ? `Edit Category: ${editingCategory.name}` : 'Create New Category'}
                 </h2>
-                <button 
+                <button
                   onClick={() => setFormOpen(false)}
                   className="p-2 text-zinc-400 hover:text-white rounded-xl hover:bg-white/5"
                 >
@@ -513,8 +513,8 @@ export default function CategoriesPage() {
                         onClick={() => setFormData(prev => ({ ...prev, status }))}
                         className={`
                           py-3 text-xs font-bold rounded-xl border uppercase tracking-wider cursor-pointer
-                          ${formData.status === status 
-                            ? 'bg-purple-600/10 border-purple-500 text-purple-400' 
+                          ${formData.status === status
+                            ? 'bg-purple-600/10 border-purple-500 text-purple-400'
                             : 'bg-zinc-950 border-zinc-850 text-zinc-500 hover:text-zinc-300'}
                         `}
                       >
@@ -554,9 +554,9 @@ export default function CategoriesPage() {
               <AlertTriangle className="w-6 h-6" />
               <h3 className="text-base font-bold text-white">Delete Category</h3>
             </div>
-            
+
             <p className="text-zinc-400 text-sm">
-              Are you sure you want to delete <span className="font-semibold text-white">"{deleteTarget.name}"</span>? 
+              Are you sure you want to delete <span className="font-semibold text-white">"{deleteTarget.name}"</span>?
               This action is permanent and cannot be undone.
             </p>
 
