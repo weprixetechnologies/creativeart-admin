@@ -311,6 +311,7 @@ export default function ProductsPage() {
                   <th className="px-6 py-4.5">Type Info</th>
                   <th className="px-6 py-4.5">Category</th>
                   <th className="px-6 py-4.5">Base Pricing</th>
+                  <th className="px-6 py-4.5">Stock</th>
                   <th className="px-6 py-4.5">Status</th>
                   <th className="px-6 py-4.5 text-right">Actions</th>
                 </tr>
@@ -318,6 +319,15 @@ export default function ProductsPage() {
               <tbody className="divide-y divide-zinc-850">
                 {items.map((item) => {
                   const categoryName = categories.find(c => c.id === item.category_id)?.name || `ID: ${item.category_id}`;
+                  const isProject = item.item_type === 'PROJECT';
+                  const isVariable = item.product_type === 'VARIABLE';
+                  const varStockSum = isVariable && item.variants
+                    ? item.variants.reduce((sum, v) => sum + (parseInt(v.stock_qty) || 0), 0)
+                    : 0;
+                  const displayStock = isProject
+                    ? null
+                    : (isVariable ? varStockSum : (item.stock_qty !== undefined && item.stock_qty !== null ? parseInt(item.stock_qty) : 100));
+
                   return (
                     <tr key={item.id} className="hover:bg-white/5 transition-colors group">
                       <td className="px-6 py-4">
@@ -355,6 +365,19 @@ export default function ProductsPage() {
                             </div>
                           )}
                         </div>
+                      </td>
+                      <td className="px-6 py-4 font-semibold text-white">
+                        {isProject ? (
+                          <span className="text-xs text-zinc-500">N/A</span>
+                        ) : isVariable ? (
+                          <span className={`text-xs font-bold ${varStockSum > 0 ? 'text-purple-400' : 'text-rose-400'}`}>
+                            {varStockSum} ({item.variants?.length || 0} variants)
+                          </span>
+                        ) : (
+                          <span className={`text-xs font-bold ${displayStock > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            {displayStock} in stock
+                          </span>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wide

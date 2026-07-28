@@ -30,6 +30,7 @@ export default function CreateProductPage() {
     slug: '',
     description: '',
     basePrice: '',
+    stockQty: '100',
     advanceAmount: '',
     finalAmount: '',
     totalAmount: '',
@@ -104,6 +105,7 @@ export default function CreateProductPage() {
       slug: formData.slug,
       description: formData.description,
       basePrice: parseFloat(formData.basePrice) || 0,
+      stockQty: isProject ? null : (parseInt(formData.stockQty, 10) || 0),
       status: formData.status,
       // Project fields
       advanceAmount: isProject ? adv : null,
@@ -276,22 +278,42 @@ export default function CreateProductPage() {
             />
           </div>
 
-          {/* Base Price */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Base Price (INR)</label>
-            <div className="relative">
-              <span className="absolute left-4 top-3.5 text-zinc-500 text-sm font-semibold">₹</span>
-              <input
-                type="number"
-                required
-                step="0.01"
-                min="0"
-                value={formData.basePrice}
-                onChange={(e) => setFormData(prev => ({ ...prev, basePrice: e.target.value }))}
-                placeholder="0.00"
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-8 pr-4 py-3.5 text-sm text-white font-semibold focus:outline-none focus:border-purple-500"
-              />
+          {/* Base Price & Stock */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Base Price (INR)</label>
+              <div className="relative">
+                <span className="absolute left-4 top-3.5 text-zinc-500 text-sm font-semibold">₹</span>
+                <input
+                  type="number"
+                  required
+                  step="0.01"
+                  min="0"
+                  value={formData.basePrice}
+                  onChange={(e) => setFormData(prev => ({ ...prev, basePrice: e.target.value }))}
+                  placeholder="0.00"
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-8 pr-4 py-3.5 text-sm text-white font-semibold focus:outline-none focus:border-purple-500"
+                />
+              </div>
             </div>
+
+            {formData.itemType === 'PRODUCT' && (
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                  Stock Quantity {formData.productType === 'VARIABLE' && '(Per-variant)'}
+                </label>
+                <input
+                  type="number"
+                  required={formData.productType !== 'VARIABLE'}
+                  min="0"
+                  disabled={formData.productType === 'VARIABLE'}
+                  value={formData.stockQty}
+                  onChange={(e) => setFormData(prev => ({ ...prev, stockQty: e.target.value }))}
+                  placeholder="100"
+                  className={`w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3.5 text-sm font-semibold text-white focus:outline-none focus:border-purple-500 ${formData.productType === 'VARIABLE' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                />
+              </div>
+            )}
           </div>
 
           {/* PROJECT split payments (shown only if itemType is PROJECT) */}

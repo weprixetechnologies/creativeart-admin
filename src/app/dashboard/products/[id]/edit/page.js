@@ -59,6 +59,7 @@ export default function EditProductPage() {
     slug: '',
     description: '',
     basePrice: '',
+    stockQty: '100',
     status: 'DRAFT'
   });
 
@@ -148,7 +149,8 @@ export default function EditProductPage() {
         name: details.name,
         slug: details.slug,
         description: details.description,
-basePrice: details.base_price,
+        basePrice: details.base_price,
+        stockQty: details.stock_qty !== undefined && details.stock_qty !== null ? String(details.stock_qty) : '100',
         status: details.status
       });
 
@@ -158,27 +160,24 @@ basePrice: details.base_price,
       setCustomFields(details.customFields || []);
 
       // Auto-set default bulk SKU prefix from slug or ID
-      const defaultPrefix = details.slug
-        ? details.slug.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10)
-        : `P${details.id}`;
-      setBulkSkuPrefix(defaultPrefix);
+      setBulkSkuPrefix(details.slug?.toUpperCase() || `P${details.id}`);
 
-      // Reconstruct attributes list from existing variants if available
+      // Auto-extract attributes from existing variants if present
       if (loadedVariants.length > 0) {
-        const extractedMap = {};
+        const attrMap = {};
         loadedVariants.forEach(v => {
-          const attrs = safeParseAttrs(v.attributes);
-          Object.entries(attrs).forEach(([k, val]) => {
-            if (!extractedMap[k]) extractedMap[k] = new Set();
-            if (val !== undefined && val !== null) extractedMap[k].add(String(val));
+          const parsed = safeParseAttrs(v.attributes);
+          Object.entries(parsed).forEach(([key, val]) => {
+            if (!attrMap[key]) attrMap[key] = new Set();
+            if (val) attrMap[key].add(String(val));
           });
         });
-        const reconstructed = Object.entries(extractedMap).map(([k, setVal]) => ({
-          name: k,
+        const extracted = Object.entries(attrMap).map(([name, setVal]) => ({
+          name,
           values: Array.from(setVal).join(', ')
         }));
-        if (reconstructed.length > 0) {
-          setAttributesList(reconstructed);
+        if (extracted.length > 0) {
+          setAttributesList(extracted);
         }
       }
 
@@ -210,6 +209,7 @@ basePrice: details.base_price,
         slug: basicForm.slug,
         description: basicForm.description,
         basePrice: parseFloat(basicForm.basePrice) || 0,
+        stockQty: basicForm.itemType === 'PROJECT' ? null : (parseInt(basicForm.stockQty, 10) || 0),
         status: basicForm.status
       };
       const updated = await apiClient.put(`/admin/products/${id}`, payload);
@@ -732,6 +732,24 @@ basePrice: details.base_price,
                   className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3.5 text-sm font-semibold text-white focus:outline-none focus:border-purple-500"
                 />
               </div>
+
+              {basicForm.itemType === 'PRODUCT' && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                    Stock Quantity {basicForm.productType === 'VARIABLE' && '(Per-variant in Variants tab)'}
+                  </label>
+                  <input
+                    type="number"
+                    required={basicForm.productType !== 'VARIABLE'}
+                    min="0"
+                    disabled={basicForm.productType === 'VARIABLE'}
+                    value={basicForm.stockQty}
+                    onChange={(e) => setBasicForm(prev => ({ ...prev, stockQty: e.target.value }))}
+                    placeholder="100"
+                    className={`w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3.5 text-sm font-semibold text-white focus:outline-none focus:border-purple-500 ${basicForm.productType === 'VARIABLE' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Product Type Selector (shown if itemType is PRODUCT) */}
