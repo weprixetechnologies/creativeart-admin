@@ -209,7 +209,7 @@ export default function EditProductPage() {
         slug: basicForm.slug,
         description: basicForm.description,
         basePrice: parseFloat(basicForm.basePrice) || 0,
-        stockQty: basicForm.itemType === 'PROJECT' ? null : (parseInt(basicForm.stockQty, 10) || 0),
+        stockQty: basicForm.itemType === 'PROJECT' ? 100 : (parseInt(basicForm.stockQty, 10) || 0),
         status: basicForm.status
       };
       const updated = await apiClient.put(`/admin/products/${id}`, payload);

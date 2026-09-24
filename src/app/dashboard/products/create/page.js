@@ -105,7 +105,7 @@ export default function CreateProductPage() {
       slug: formData.slug,
       description: formData.description,
       basePrice: parseFloat(formData.basePrice) || 0,
-      stockQty: isProject ? null : (parseInt(formData.stockQty, 10) || 0),
+      stockQty: isProject ? 100 : (parseInt(formData.stockQty, 10) || 0),
       status: formData.status,
       // Project fields
       advanceAmount: isProject ? adv : null,
